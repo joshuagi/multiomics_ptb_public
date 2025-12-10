@@ -1,0 +1,12 @@
+data:
+  timepoints:
+  - T1
+  - T2
+  - T3
+  data_config: Patient
+  save_dir: results/cfg_1/submodels
+  result_dir: results/cfg_1/model_analysis
+  processed_data: data/prep/prince/20240903_totalData.rds
+  sample_metadata: data/prep/prince/20240903_metadata_full.csv
+training:
+  mode: classification

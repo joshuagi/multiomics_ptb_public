@@ -1,0 +1,11 @@
+data:
+  timepoints:
+  - T1
+  - T2
+  data_config: Sample
+  save_dir: results/cfg_4/submodels
+  result_dir: results/cfg_4/model_analysis
+  processed_data: data/prep/prince/20240903_totalData.rds
+  sample_metadata: data/prep/prince/20240903_metadata_full.csv
+training:
+  mode: regression
