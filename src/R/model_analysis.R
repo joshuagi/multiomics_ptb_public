@@ -97,10 +97,15 @@ if (cfg$training$mode == "classification") {
   
   
   
+  predictions <- predictions %>%
+    mutate(response = factor(response, levels = c(0, 1))) %>%
+    group_by(obs, response, model, stimulation) %>%
+    dplyr::summarise(pred = mean(.pred_1)) %>%
+    ungroup
+
   calculateRoc <- predictions %>%
     mutate(U = paste0(stimulation, "_", model)) %>%
     droplevels() %>%
-    
     
     split(.$U) %>%
     purrr::map(., function(x) {
@@ -108,7 +113,7 @@ if (cfg$training$mode == "classification") {
       model_i <- unique(x$model)
       U_i <- unique(x$U)
       
-      r <- roc(x$response, x$.pred_1, ci = TRUE, direction="<")
+      r <- roc(x$response, x$pred, ci = TRUE, direction="<")
       r.stats <- data.frame(r$ci) %>%
         t() %>%
         data.frame() %>%
@@ -190,11 +195,7 @@ if (cfg$training$mode == "classification") {
          device = "pdf",
          useDingbats = FALSE)
   
-  predictions <- predictions %>%
-    mutate(response = factor(response, levels = c(0, 1))) %>%
-    group_by(obs, response, model, stimulation) %>%
-    dplyr::summarise(pred = mean(.pred_1)) %>%
-    ungroup
+
   
   p.value <- predictions %>%
     filter(stimulation == "SG") %>%
@@ -570,10 +571,7 @@ selected_models <- c(selected_models, "SG_Lasso")
 model_preds <- predictions %>%
   mutate(U = paste0(stimulation, "_", model)) %>%
   filter(U %in% selected_models) %>%
-  mutate(patientID = str_split(obs, pattern = "_", simplify = T)[,1]) %>%
-  group_by(obs, patientID, response, model, stimulation, U) %>%
-  dplyr::summarise(pred = median(pred)) %>%
-  ungroup() %>%
+  mutate(patientID = as.character(obs)) %>%
   select( obs,patientID,response, U,  pred) %>%
   pivot_wider(names_from = "U", values_from = "pred")
 confounder.table <- model_preds %>%
